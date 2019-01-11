@@ -1,27 +1,63 @@
-# AngularMaterialDemo
+- npm install @angular/cdk
+- import OverlayModule in module
+- import { OverlayRef, CdkOverlayOrigin, Overlay, OverlayConfig } from '@angular/cdk/overlay' in parent component
+- import { ComponentPortal, PortalInjector } from '@angular/cdk/portal' in parent component
+- create component for overlay
+- add it to entryComponents of module
+- add cdkOverlayOrigin in the parent component template
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.8.
+- this is for injecting data
+  import { InjectionToken } from '@angular/core';
+  export const CONTAINER_DATA = new InjectionToken<any>('CONTAINER_DATA');
 
-## Development server
+- add function to open overlay
+  detailsOverlayRef: OverlayRef;
+  @ViewChild(CdkOverlayOrigin) _overlayOrigin: CdkOverlayOrigin;
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+  constructor(
+    public overlay: Overlay,
+    public viewContainerRef: ViewContainerRef,
+    private injector: Injector,
+  ) { }
 
-## Code scaffolding
+  displayDetailsOverlay() {
+    const strategy = this.overlay.position().connectedTo(
+      this._overlayOrigin.elementRef,
+      { originX: 'end', originY: 'top' },
+      { overlayX: 'end', overlayY: 'top' }
+    );
+    const config = new OverlayConfig({
+      positionStrategy: strategy
+    });
+    this.detailsOverlayRef = this.overlay.create(config);
+    this.detailsOverlayRef.attach(
+      new ComponentPortal(WidgetActionsOverlayComponent, this.viewContainerRef, this.createInjector(widget, this.detailsOverlayRef))
+    );
+  }
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+  createInjector(data: any, overlayRef: OverlayRef): PortalInjector {
+    const injectorTokens = new WeakMap();
+    injectorTokens.set(OverlayRef, overlayRef);
+    injectorTokens.set(CONTAINER_DATA, data);
+    return new PortalInjector(this.injector, injectorTokens);
+  }
 
-## Build
+- Add detach function to overlay
+  constructor(
+    public overlayRef: OverlayRef
+    ) { }
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+  ngOnInit() {
+  }
 
-## Running unit tests
+  detachOverlay() {
+    this.overlayRef.detach();
+  }
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+- Or add backdrop in overlay config 
+      hasBackdrop: true,
+      backdropClass: 'cdk-overlay-transparent-backdrop'
+then 
+    this.detailsOverlayRef.backdropClick().subscribe(() => {
+      this.detailsOverlayRef.dispose();
+    });
