@@ -1,26 +1,26 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
+import { MatButtonModule } from '@angular/material';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { AppComponent } from './app.component';
 import { OverlayComponent } from './overlay/overlay.component';
-
-import { OverlayModule } from '@angular/cdk/overlay';
-import { DetailsOverlayComponent } from './overlay/details-overlay/details-overlay.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    OverlayComponent,
-    DetailsOverlayComponent
+    OverlayComponent
   ],
   imports: [
     BrowserModule,
     OverlayModule,
+    MatButtonModule,
+    MatToolbarModule
   ],
   providers: [],
   bootstrap: [AppComponent],
   entryComponents: [
-    DetailsOverlayComponent
+    OverlayComponent
   ]
 })
 export class AppModule { }

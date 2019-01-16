@@ -1,0 +1,11 @@
+mat-toolbar {
+  margin-bottom: 20px;
+}
+
+mat-toolbar-row {
+  justify-content: center;
+}
+
+mat-toolbar-row h3 {
+  font-size: 16px;
+}
