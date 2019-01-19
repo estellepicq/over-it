@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { MatButtonModule } from '@angular/material';
+import { MatButtonModule, MatInputModule } from '@angular/material';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { AppComponent } from './app.component';
@@ -13,9 +14,11 @@ import { OverlayComponent } from './overlay/overlay.component';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     OverlayModule,
     MatButtonModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatInputModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

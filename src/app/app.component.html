@@ -1,11 +1,12 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
-    <h1 style="font-size: 24px">Over.it</h1>
+    <h1>Over.it</h1>
   </mat-toolbar-row>
   <mat-toolbar-row>
-    <h3 style="font-size: 16px">Angular Material CDK Overlay step by step</h3>
+    <h3>Simple overlay creation with Angular Material CDK</h3>
   </mat-toolbar-row>
 </mat-toolbar>
 
-<button mat-raised-button cdkOverlayOrigin (click)=displayOverlay()>Click me!</button>
-
+<div class="container">
+  <button mat-raised-button cdkOverlayOrigin (click)=displayOverlay()>Click me!</button>
+</div>
