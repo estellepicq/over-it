@@ -1,0 +1,6 @@
+.overlay-container {
+  border: 1px solid #ccc;
+  padding: 15px;  
+  border-radius: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+}

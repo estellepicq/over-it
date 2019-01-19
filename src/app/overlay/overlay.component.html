@@ -1,1 +1,8 @@
-<h1>HELLO</h1>
+<div class="overlay-container">
+  <p>This is the injected data:</p>
+  <p>{{ data.data }}</p>
+  <p style="color: #606060">You can close this overlay clicking around it, or clicking on the 'close me' button</p>
+  <div class="overlay-actions">
+    <button mat-raised-button (click)="close()">Close me!</button>
+  </div>
+</div>
