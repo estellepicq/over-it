@@ -1,6 +1,6 @@
 # over-it
 
-Simple overlay creation with Angular Material CDK
+Learn how to create an overlay with Angular Material CDK
 
 [Demo](http://overit.estellepicq.com/)
 
