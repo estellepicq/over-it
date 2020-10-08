@@ -5,10 +5,13 @@ Learn how to create an overlay with Angular Material CDK
 [Demo](http://overit.estellepicq.com/)
 
 ## Table of contents 
-1. [Installation](#installation)
-2. [Overlay component creation](#overlay-component-creation)
-3. [Parent component](#parent-component)
-4. [Inject data](#inject-data)
+- [over-it](#over-it)
+  - [Table of contents](#table-of-contents)
+- [Installation](#installation)
+- [Overlay component creation](#overlay-component-creation)
+- [Parent component](#parent-component)
+- [Passing data to overlay component](#passing-data-to-overlay-component)
+- [Close overlay](#close-overlay)
 
 # Installation
 
@@ -32,121 +35,86 @@ Learn how to create an overlay with Angular Material CDK
 1. Create a new component (ex: OverlayComponent): 
 `ng generate component overlay`
 
-2. Add it to entryComponents in your app module:
-```typescript
-  import { OverlayModule } from '@angular/cdk/overlay';
-  import { OverlayComponent } from 'overlay/overlay.component';
- 
-  @NgModule({
-    imports: [
-      ...,
-      OverlayModule
-    ],
-    entryComponents: [
-    OverlayComponent
-    ...
-  })
-  export class AppModule { }
-  ```
-
 # Parent component
 1. Add cdkOverlayOrigin to an element of the template:
 ```html
-<button cdkOverlayOrigin (click)="displayOverlay()">Click me!</button>
+<button cdkOverlayOrigin (click)="displayOverlay()" #trigger="cdkOverlayOrigin">Click me!</button>
 ```
 2.  Import the following:
 ```typescript
-import { Component, ViewChild, ViewContainerRef } from  '@angular/core';
-import { OverlayRef, CdkOverlayOrigin, Overlay, OverlayConfig } from  '@angular/cdk/overlay';
-import { ComponentPortal } from  '@angular/cdk/portal';
-import { OverlayComponent } from  './overlay/overlay.component'; // replace by your component
+import { CdkConnectedOverlay } from '@angular/cdk/overlay';
+import { Component } from '@angular/core';
 ```
 
-3. Create displayOverlay function in parent component
+3. Add overlay options inside parent component, and functions for displaying / hiding overlay
 ```typescript
 export class AppComponent {
 
-	overlayRef: OverlayRef;
-	@ViewChild(CdkOverlayOrigin) _overlayOrigin: CdkOverlayOrigin;
-
-	constructor(
-	public overlay: Overlay,
-	public viewContainerRef: ViewContainerRef
-  ) { }
-  
-	displayOverlay() {
-	const strategy = this.overlay.position().connectedTo(
-	this._overlayOrigin.elementRef,
-    { originX: 'end', originY: 'top' },
-    { overlayX: 'end', overlayY: 'top' }
-	);
-	const config = new OverlayConfig({
-    positionStrategy: strategy,
+  public isOverlayDisplayed = false;
+  public readonly overlayOptions: Partial<CdkConnectedOverlay> = {
     hasBackdrop: true,
-    backdropClass: 'transparent'
-	});
-	this.overlayRef = this.overlay.create(config);
-	this.overlayRef.attach(
-	new ComponentPortal(OverlayComponent, this.viewContainerRef)
-	);
-	this.overlayRef.backdropClick().subscribe(() =>  this.overlayRef.detach()); // Allows to close overlay by clicking around it
-	}
+    positions: [
+      { originX: 'end', originY: 'bottom', overlayX: 'start',  overlayY: 'top'}
+    ],
+    /* You can add to this object all of these options */
+    // backdropClass: '',
+    // flexibleDimensions: false,
+    // growAfterOpen: false,
+    // height: 'auto',
+    // width: 'auto',
+    // lockPosition: true,
+    // minHeight: 'unset',
+    // minWidth: 'unset',
+    // offsetX: 0,
+    // offsetY: 0,
+    // panelClass: '',
+    // positionStrategy,
+    // push,
+    // scrollStrategy,
+    // transformOriginSelector,
+    // viewportMargin,
+  };
+
+  constructor() { }
+
+  public displayOverlay(): void {
+    this.isOverlayDisplayed = true;
+  }
+
+  public hideOverlay(): void {
+    this.isOverlayDisplayed = false;
+  }
 }
 ```
 
-# Inject data
-1. Create a file tokens.ts and add this content:
-```typescript
-import { InjectionToken } from '@angular/core';
-export const CONTAINER_DATA = new InjectionToken<any>('CONTAINER_DATA');
+4. Add overlay in parent template with optionnal configuration
+```html
+<ng-template
+  #connectedOverlay="cdkConnectedOverlay"
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOverlayDisplayed"
+  [cdkConnectedOverlayHasBackdrop]="overlayOptions.hasBackdrop"
+  [cdkConnectedOverlayPositions]="overlayOptions.positions">
+  <app-overlay></app-overlay> <!-- Your overlay component -->
+</ng-template>
 ```
 
-2. Add an injection function to your parent component
+
+# Passing data to overlay component
+1. Create an input property inside overlay component
 ```typescript
-import { ..., Injector } from '@angular/core';
-import { ..., PortalInjector } from '@angular/cdk/portal';  
-import { CONTAINER_DATA } from './tokens';
-constructor (
-  ...,
-  private injector: Injector
-) { }
-createInjector(data: any, overlayRef: OverlayRef): PortalInjector {
-  const injectorTokens = new WeakMap();
-  injectorTokens.set(OverlayRef, overlayRef);
-  injectorTokens.set(CONTAINER_DATA, data);
-  return new PortalInjector(this.injector, injectorTokens);
+export class OverlayComponent {
+
+  @Input() data: { msg: string };
+  ...
 }
 ```
 
-3. Inject data within the displayOverlay() function
-```typescript
+2. Pass data through parent component
+```html
 ...
-this.overlayRef.attach(
-  new ComponentPortal(OverlayComponent, this.viewContainerRef,
-    this.createInjector({ data: 'Your data' }, this.overlayRef) // this is new
-  )
-);
-...
-```
-
-4. Get data in overlay component
-
-```typescript
-import { ..., Inject } from '@angular/core';
-import { OverlayRef } from '@angular/cdk/overlay';
-import { CONTAINER_DATA } from '../tokens';
-
-...
-
-constructor(
-  @Inject(CONTAINER_DATA) public data: any, // Here are your data
-  public overlayRef: OverlayRef
-  ) { }
-
-close() {
-  this.overlayRef.detach(); // Close overlay from the component itself
-}
-
+<app-overlay [data]="{msg: 'Your data'}"></app-overlay>
 ...
 ```
 
@@ -154,8 +122,68 @@ close() {
 ```html
 <div class="overlay-container">
   <p>This is the injected data: {{ data.data }}</p>
+</div>
+```
+
+# Close overlay
+1. Option 1: On backdrop click
+When 'hasBackdrop' option is activated, a backdropClick event is emitted. We can get it in parent component as follow.
+
+```html
+...
+<ng-template
+  #connectedOverlay="cdkConnectedOverlay"
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOverlayDisplayed"
+  [cdkConnectedOverlayHasBackdrop]="overlayOptions.hasBackdrop"
+  [cdkConnectedOverlayPositions]="overlayOptions.positions"
+  (backdropClick)="hideOverlay()">
+  <app-overlay [data]="{msg: 'Your data'}"></app-overlay>
+</ng-template>
+...
+```
+
+2. Option 2: From overlay component
+
+In the parent component:
+- listen to detach event, in order to update isOverlayDisplayed property
+- pass connectedOverlay as an input of overlay component
+
+```html
+...
+<ng-template
+  #connectedOverlay="cdkConnectedOverlay"
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOverlayDisplayed"
+  [cdkConnectedOverlayHasBackdrop]="overlayOptions.hasBackdrop"
+  [cdkConnectedOverlayPositions]="overlayOptions.positions"
+  (backdropClick)="hideOverlay()"
+  (detach)="hideOverlay()">
+  <app-overlay [data]="{msg: 'Your data'}" [connectedOverlay]="connectedOverlay"></app-overlay>
+</ng-template>
+...
+```
+
+In the overlay component, add a button to close:
+```html
+<div class="overlay-container">
+  <p>This is the injected data: {{ data.data }}</p>
   <div>
     <button mat-raised-button (click)="close()">Close me!</button>
   </div>
 </div>
+```
+
+And the associated controller:
+```typescript
+export class OverlayComponent {
+...
+@Input() connectedOverlay: CdkConnectedOverlay;
+...
+public close(): void {
+  this.connectedOverlay.overlayRef.detach();
+}
+...
 ```

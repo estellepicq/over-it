@@ -1,6 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { OverlayRef } from '@angular/cdk/overlay';
-import { CONTAINER_DATA } from '../tokens';
+import { Component, Input } from '@angular/core';
+import { CdkConnectedOverlay } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-overlay',
@@ -9,13 +8,14 @@ import { CONTAINER_DATA } from '../tokens';
 })
 export class OverlayComponent {
 
+  @Input() data: { msg: string };
+  @Input() connectedOverlay: CdkConnectedOverlay;
+
   constructor(
-    @Inject(CONTAINER_DATA) public data: any,
-    public overlayRef: OverlayRef
   ) { }
 
-  close() {
-    this.overlayRef.detach();
+  public close(): void {
+    this.connectedOverlay.overlayRef.detach();
   }
 
 }

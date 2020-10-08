@@ -1,6 +1,9 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
     <h1>Over.it</h1>
+    <a class="github-link" href="https://github.com/estellepicq/over-it">
+      GitHub
+    </a>
   </mat-toolbar-row>
   <mat-toolbar-row>
     <h3>Simple overlay creation with Angular Material CDK</h3>
@@ -8,5 +11,19 @@
 </mat-toolbar>
 
 <div class="container">
-  <button mat-raised-button cdkOverlayOrigin (click)=displayOverlay()>Click me!</button>
+  <button mat-raised-button (click)="displayOverlay()" type="button" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+    Click me!
+  </button>
+
+  <ng-template
+    #connectedOverlay="cdkConnectedOverlay"
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="isOverlayDisplayed"
+    [cdkConnectedOverlayHasBackdrop]="overlayOptions.hasBackdrop"
+    [cdkConnectedOverlayPositions]="overlayOptions.positions"
+    (backdropClick)="hideOverlay()"
+    (detach)="hideOverlay()">
+    <app-overlay [data]="{msg: 'Your data'}" [connectedOverlay]="connectedOverlay"></app-overlay>
+  </ng-template>
 </div>
