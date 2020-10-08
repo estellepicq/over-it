@@ -5,8 +5,6 @@ Learn how to create an overlay with Angular Material CDK
 [Demo](http://overit.estellepicq.com/)
 
 ## Table of contents 
-- [over-it](#over-it)
-  - [Table of contents](#table-of-contents)
 - [Installation](#installation)
 - [Overlay component creation](#overlay-component-creation)
 - [Parent component](#parent-component)
@@ -121,7 +119,7 @@ export class OverlayComponent {
 5. Display it in the overlay template
 ```html
 <div class="overlay-container">
-  <p>This is the injected data: {{ data.data }}</p>
+  <p>This is the injected data: {{ data.msg }}</p>
 </div>
 ```
 
